@@ -3,20 +3,39 @@ default: &default
   encoding: unicode
   pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
   timeout: 5000
-  url: <%= begin
+
+  host: <%= begin
     require 'json'
-    vcap = JSON.parse(ENV['VCAP_SERVICES'])
-    service = vcap.values.flatten.find { |s| s['label'] == 'postgresql' || s['name'] =~ /postgres/i }
-    if service
-      creds = service['credentials']
-      "postgres://#{creds['username']}:#{creds['password']}@#{creds['host']}:#{creds['port']}/#{creds['dbname']}?options=-c%20search_path%3Ddocuseal"
-    else
-      raise "No PostgreSQL service found in VCAP_SERVICES"
-    end
-  rescue => e
-    puts "Error parsing VCAP_SERVICES: #{e.message}"
-    nil
+    JSON.parse(ENV['VCAP_SERVICES']).values.flatten
+      .find { |s| s['label'] == 'postgresql' || s['name'] =~ /postgres/i }
+      .dig('credentials', 'host')
   end %>
+
+  port: <%= begin
+    JSON.parse(ENV['VCAP_SERVICES']).values.flatten
+      .find { |s| s['label'] == 'postgresql' || s['name'] =~ /postgres/i }
+      .dig('credentials', 'port')
+  end %>
+
+  username: <%= begin
+    JSON.parse(ENV['VCAP_SERVICES']).values.flatten
+      .find { |s| s['label'] == 'postgresql' || s['name'] =~ /postgres/i }
+      .dig('credentials', 'username')
+  end %>
+
+  password: <%= begin
+    JSON.parse(ENV['VCAP_SERVICES']).values.flatten
+      .find { |s| s['label'] == 'postgresql' || s['name'] =~ /postgres/i }
+      .dig('credentials', 'password')
+  end %>
+
+  database: <%= begin
+    JSON.parse(ENV['VCAP_SERVICES']).values.flatten
+      .find { |s| s['label'] == 'postgresql' || s['name'] =~ /postgres/i }
+      .dig('credentials', 'dbname')
+  end %>
+
+  search_path: <%= ENV['SEARCH_PATH'] || 'public' %>
 
 development:
   <<: *default
