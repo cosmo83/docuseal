@@ -11,12 +11,17 @@ services:
     environment:
       VCAP_SERVICES: >-
         {"postgresql-db":[{"label":"postgresql-db","provider":null,"plan":"free","name":"SEIT-Contract-dev-postgres","tags":["relational","database"],"instance_guid":"1664809d-4155-4ef5-ae4d-440f0c25e9f5","instance_name":"SEIT-Contract-dev-postgres","binding_guid":"c1374045-b3f2-418a-9bee-9fc8693be277","binding_name":null,"credentials":{"username":"postgres","password":"postgres","hostname":"postgres","dbname":"docuseal","port":"5432","uri":"postgres://postgres:postgres@postgres:5432/docuseal"}}]}
+      RAILS_LOG_LEVEL: debug
+      DATABASE_SEARCH_PATH: docusealschema
 
 
   postgres:
     image: postgres:15
     volumes:
       - './pg_data:/var/lib/postgresql/data'
+      - './init.sql:/docker-entrypoint-initdb.d/init.sql'
+    ports:
+      - 5432:5432
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres

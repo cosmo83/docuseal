@@ -7,6 +7,7 @@
 
   puts "[DEBUG] VCAP_SERVICES: #{vcap_services}"
   puts "[DEBUG] PostgreSQL credentials: #{creds}"
+  puts "[DEBUG] PostgreSQL credentials: #{ENV['DATABASE_SEARCH_PATH']}"
 %>
 
 default: &default
@@ -18,7 +19,7 @@ default: &default
   host: <%= creds['hostname'] %>
   port: <%= creds['port'] %>
   database: <%= creds['dbname'] %>
-  search_path: <%= ENV['DATABASE_SEARCH_PATH'] || 'public' %>
+  schema_search_path: <%= ENV['DATABASE_SEARCH_PATH'] || 'public' %>
 
 development:
   <<: *default
