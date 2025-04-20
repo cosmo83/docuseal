@@ -37,16 +37,8 @@ Rails.application.configure do
   config.public_file_server.enabled = true
 
   # Store uploaded files on the local file system (see config/storage.yml for options).
-  config.active_storage.service =
-    if ENV['S3_ATTACHMENTS_BUCKET'].present?
-      :aws_s3
-    elsif ENV['GCS_BUCKET'].present?
-      :google
-    elsif ENV['AZURE_CONTAINER'].present?
-      :azure
-    else
-      :disk
-    end
+  config.active_storage.service = :aws_s3
+
 
   config.active_storage.resolve_model_to_route = :rails_storage_proxy if ENV['ACTIVE_STORAGE_PUBLIC'] != 'true'
   config.active_storage.service_urls_expire_in = ENV.fetch('PRESIGNED_URLS_EXPIRE_MINUTES', '240').to_i.minutes
