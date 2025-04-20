@@ -18,7 +18,7 @@ default: &default
   host: <%= creds['host'] %>
   port: <%= creds['port'] %>
   database: <%= creds['dbname'] %>
-  schema_search_path: <%= creds['search_path'] || 'public' %>
+  search_path: <%= ENV['DATABASE_SEARCH_PATH'] || 'public' %>
 
 development:
   <<: *default
