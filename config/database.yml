@@ -15,7 +15,7 @@ default: &default
   pool: 5
   username: <%= creds['username'] %>
   password: <%= creds['password'] %>
-  host: <%= creds['host'] %>
+  host: <%= creds['hostname'] %>
   port: <%= creds['port'] %>
   database: <%= creds['dbname'] %>
   search_path: <%= ENV['DATABASE_SEARCH_PATH'] || 'public' %>
