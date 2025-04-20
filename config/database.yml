@@ -1,39 +1,28 @@
+<%
+  require 'json'
+
+  vcap_services = JSON.parse(ENV['VCAP_SERVICES'] || '{}')
+  pg_service = vcap_services['postgresql-db']&.first
+  creds = pg_service['credentials'] if pg_service
+
+  puts "[DEBUG] VCAP_SERVICES: #{vcap_services}"
+  puts "[DEBUG] PostgreSQL credentials: #{creds}"
+%>
+
 default: &default
   adapter: postgresql
   encoding: unicode
-  pool: <%= ENV.fetch('RAILS_MAX_THREADS', 15).to_i + ENV.fetch('SIDEKIQ_THREADS', 5).to_i %>
+  pool: 5
+  username: <%= creds['username'] %>
+  password: <%= creds['password'] %>
+  host: <%= creds['host'] %>
+  port: <%= creds['port'] %>
+  database: <%= creds['dbname'] %>
+  schema_search_path: <%= creds['search_path'] || 'public' %>
 
 development:
   <<: *default
-  database: docuseal_dev
-
-test:
-  <<: *default
-  database: docuseal_test
 
 production:
   <<: *default
-  <% require 'json' %>
-  <% vcap_services = JSON.parse(ENV['VCAP_SERVICES'] || '{}') %>
-  <% pg_service = vcap_services['postgresql-db']&.first %>
-  <% creds = pg_service['credentials'] if pg_service %>
 
-  <% if creds %>
-  adapter: postgresql
-  host: <%= creds['hostname'] %>
-  port: <%= creds['port'] %>
-  database: <%= creds['dbname'] %>
-  username: <%= creds['username'] %>
-  password: <%= creds['password'] %>
-  <% if !ENV['DATABASE_SEARCH_PATH'].to_s.empty? %>
-  search_path: <%= ENV['DATABASE_SEARCH_PATH'] %>
-  <% end %>
-  sslmode: require
-  <% else %>
-  # fallback config if VCAP_SERVICES is not available
-  host: <%= ENV['DATABASE_HOST'] %>
-  port: <%= ENV['DATABASE_PORT'] %>
-  database: <%= ENV['DATABASE_NAME'] %>
-  username: <%= ENV['DATABASE_USER'] %>
-  password: <%= ENV['DATABASE_PASSWORD'] %>
-  <% end %>
